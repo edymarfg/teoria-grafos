@@ -10,14 +10,19 @@ import java.util.Scanner;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teoriagrafos.teoriagrafos.model.Rotas;
+
 @Service
 public class SearchAPIService {
-    public void searchAPIService() {
+    public Rotas searchAPIService() {
+        Rotas rotas = null;
         // Substitua 'SUA_CHAVE_DE_API' pela chave de API fornecida pelo OpenRouteService
         String apiKey = "5b3ce3597851110001cf6248149b01337fa5430f80e83e5889a3aa44";
 
         // Obtenha as coordenadas da cidade
-        double[] cityCoordinates = getCityCoordinates("porto+alegre");
+        double[] cityCoordinates = getCityCoordinates("sao-paulo-sp");
+        double[] cityDestiny = getCityCoordinates("barueri-sp");
 
         // Verifique se as coordenadas foram obtidas com sucesso
         if (cityCoordinates != null) {
@@ -26,11 +31,12 @@ public class SearchAPIService {
 
             // Parâmetros da solicitação
             String coordinates = cityCoordinates[1] + "," + cityCoordinates[0]; // latitude,longitude
-            String profile = "walking";  // Perfil de roteamento (pode ser walking, cycling, etc.)
+            String coordinatesDest = cityDestiny[1] + "," + cityDestiny[0];
+            String profile = "driving-car";  // Perfil de roteamento (pode ser walking, cycling, etc.)
 
             // Construa a URL da solicitação
-            String urlString = String.format("%s%s?api_key=%s&coordinates=%s",
-                    baseUrl, profile, apiKey, coordinates);
+            String urlString = String.format("%s%s?api_key=%s&start=%s&end=%s",
+                    baseUrl, profile, apiKey, coordinates, coordinatesDest);
 
             try {
                 // Crie um objeto URL a partir da string da URL
@@ -60,9 +66,13 @@ public class SearchAPIService {
                     }
 
                     reader.close();
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    rotas = objectMapper.readValue(response.toString(), Rotas.class);
 
                     // O conteúdo da resposta está em formato JSON
                     System.out.println(response.toString());
+                    
+                    
                 } else {
                     System.out.println("Erro na solicitação: " + connection.getResponseMessage());
                 }
@@ -76,6 +86,7 @@ public class SearchAPIService {
         } else {
             System.out.println("Não foi possível obter as coordenadas da cidade.");
         }
+        return rotas;
     }
 
     private double[] getCityCoordinates(String cityName) {

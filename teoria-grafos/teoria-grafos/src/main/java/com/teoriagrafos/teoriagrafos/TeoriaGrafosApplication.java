@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import com.teoriagrafos.teoriagrafos.model.Grafo;
+import com.teoriagrafos.teoriagrafos.model.Segment;
 import com.teoriagrafos.teoriagrafos.service.SearchAPIService;
 
 @SpringBootApplication
@@ -37,9 +38,27 @@ public class TeoriaGrafosApplication {
         
         
         //grafo.buscaEmLargura();
-        searchAPIService.searchAPIService();
+        var rotas = searchAPIService.searchAPIService();
+        System.out.println(rotas);
+        Grafo<Segment> grafoRotas = new Grafo<Segment>();
+        
+
+        // rotas.getFeatures().forEach(feature -> {
+        //     feature.getProperties().getSegments().forEach(segment -> {
+        //         grafoRotas.adicionarVertice(segment);
+        //         grafoRotas.adicionarAresta(segment.getPeso(), "Porto Alegre", null);
+        //     });
+        // });
 	};
 
 	}
+
+    private static double getPeso(double ...numbers) {
+        var total = 0.0;
+        for (double d : numbers) {
+            total += d;
+        }
+        return total;
+    }
 
 }

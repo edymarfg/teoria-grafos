@@ -6,42 +6,53 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teoriagrafos.teoriagrafos.model.SearchAutoCompleteModels.OptionLocation;
-import com.teoriagrafos.teoriagrafos.model.SearchRotasModels.Rotas;
+import com.teoriagrafos.teoriagrafos.model.SearchAutoCompleteModels.PropertiesAuto;
+import com.teoriagrafos.teoriagrafos.model.SearchAutoCompleteModels.SearchAutocomplete;
 
-import lombok.AllArgsConstructor;
 import static utils.OpenRouteUtils.*;
 
 @Service
-@AllArgsConstructor
-public class SearchAPIService {
+public class SearchLocalAutoCompleteService {
 
-    private static final String ROTA_URL = BASE_URL + "v2/directions/";
+    private static final String AUTOCOMPLETE_URL = BASE_URL + "geocode/autocomplete";
 
-    private GetCoordinatesService getCoordinatesService;
+    public List<OptionLocation> getOptionsLocations(String name) {
+        var search = localAutoComplete(name);
+        return getOptionsLocations(search);
+    }
 
-    public Rotas searchAPIService(List<OptionLocation> options) {
-        Rotas rotas = null;   
+    private List<OptionLocation> getOptionsLocations(SearchAutocomplete searchAutocomplete) {
+        if (searchAutocomplete == null) {
+            return List.of();
+        }
+        return searchAutocomplete.getFeatures().stream().map(it -> 
+            buildOptionLocation(it.getProperties(), it.getGeometry().getCoordinates())
+        ).collect(Collectors.toList());
+    }
 
-        // Obtenha as coordenadas da cidade
-        // double[] cityCoordinates = getCoordinatesService.getCityCoordinates("Tokyo, Japan");
-        // double[] cityDestiny = getCoordinatesService.getCityCoordinates("Tokyo, Japan");
+    private OptionLocation buildOptionLocation(PropertiesAuto properties, ArrayList<Double> coordinates) {
+        return OptionLocation.builder()
+        .label(properties.getLabel())
+        .value(coordinates)
+        .build();
+    }
 
-        // Verifique se as coordenadas foram obtidas com sucesso
-        if (!options.get(0).getValue().isEmpty()) {
-            // Parâmetros da solicitação
-            String coordinates = options.get(0).getValue().get(0) + "," + options.get(0).getValue().get(1); // latitude,longitude
-            String coordinatesDest = (options.get(1).getValue().get(0) - 0.2) + "," + (options.get(1).getValue().get(1) - 0.2);
-            String profile = "driving-car";  // Perfil de roteamento (pode ser driving-car, etc.)
+    private SearchAutocomplete localAutoComplete(String name) {
+        name = removerAcentos(name.toLowerCase().replace(" ", ""));
+        SearchAutocomplete search = null;
 
-            // Construa a URL da solicitação
-            String urlString = String.format("%s%s?api_key=%s&start=%s&end=%s",
-                    ROTA_URL, profile, API_KEY, coordinates, coordinatesDest);
+        String urlString = String.format("%s?api_key=%s&text=%s",
+                    AUTOCOMPLETE_URL, API_KEY, name);
 
             try {
                 // Crie um objeto URL a partir da string da URL
@@ -71,11 +82,12 @@ public class SearchAPIService {
                     }
 
                     reader.close();
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    rotas = objectMapper.readValue(response.toString(), Rotas.class);
 
                     // O conteúdo da resposta está em formato JSON
                     System.out.println(response.toString());
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                    search = mapper.readValue(response.toString(), SearchAutocomplete.class);
                     
                     
                 } else {
@@ -88,10 +100,11 @@ public class SearchAPIService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
-            System.out.println("Não foi possível obter as coordenadas da cidade.");
-            throw new IllegalStateException("Não foi possível obter as coordenadas da cidade.");
-        }
-        return rotas;
+            return search;
     }
+
+    public static String removerAcentos(String str) {
+    return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+}
+    
 }

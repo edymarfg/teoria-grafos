@@ -6,9 +6,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.teoriagrafos.teoriagrafos.model.Grafo;
-import com.teoriagrafos.teoriagrafos.model.Segment;
+import com.teoriagrafos.teoriagrafos.model.GrafoModels.Grafo;
+import com.teoriagrafos.teoriagrafos.model.SearchRotasModels.Segment;
 import com.teoriagrafos.teoriagrafos.service.SearchAPIService;
+import com.teoriagrafos.teoriagrafos.service.SearchLocalAutoCompleteService;
 
 @SpringBootApplication
 public class TeoriaGrafosApplication {
@@ -19,6 +20,9 @@ public class TeoriaGrafosApplication {
 
     @Autowired
     private SearchAPIService searchAPIService;
+
+    @Autowired
+    private SearchLocalAutoCompleteService searchLocalAutoCompleteService;
 
 	@Bean
 	CommandLineRunner initMain() {
@@ -38,8 +42,9 @@ public class TeoriaGrafosApplication {
         
         
         //grafo.buscaEmLargura();
-        var rotas = searchAPIService.searchAPIService();
-        System.out.println(rotas);
+        //var rotas = searchAPIService.searchAPIService();
+        //System.out.println(rotas);
+        //var teste = searchLocalAutoCompleteService.getOptionsLocations("portoa");
         Grafo<Segment> grafoRotas = new Grafo<Segment>();
         
 

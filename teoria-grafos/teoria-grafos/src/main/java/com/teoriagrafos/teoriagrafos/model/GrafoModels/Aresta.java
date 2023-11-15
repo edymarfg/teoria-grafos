@@ -1,4 +1,4 @@
-package com.teoriagrafos.teoriagrafos.model;
+package com.teoriagrafos.teoriagrafos.model.GrafoModels;
 
 public class Aresta<TIPO> {
     private Double peso;

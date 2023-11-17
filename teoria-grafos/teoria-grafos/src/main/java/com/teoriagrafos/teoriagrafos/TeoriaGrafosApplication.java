@@ -10,6 +10,7 @@ import com.teoriagrafos.teoriagrafos.model.GrafoModels.Grafo;
 import com.teoriagrafos.teoriagrafos.model.SearchRotasModels.Segment;
 import com.teoriagrafos.teoriagrafos.service.SearchAPIService;
 import com.teoriagrafos.teoriagrafos.service.SearchLocalAutoCompleteService;
+import com.teoriagrafos.teoriagrafos.service.SearchMatrixLocationsService;
 
 @SpringBootApplication
 public class TeoriaGrafosApplication {
@@ -23,6 +24,9 @@ public class TeoriaGrafosApplication {
 
     @Autowired
     private SearchLocalAutoCompleteService searchLocalAutoCompleteService;
+
+    @Autowired
+    private SearchMatrixLocationsService searchMatrixLocationsService;
 
 	@Bean
 	CommandLineRunner initMain() {
@@ -45,6 +49,7 @@ public class TeoriaGrafosApplication {
         //var rotas = searchAPIService.searchAPIService();
         //System.out.println(rotas);
         //var teste = searchLocalAutoCompleteService.getOptionsLocations("portoa");
+        var teste = searchMatrixLocationsService.buildSearchMatrix();
         Grafo<Segment> grafoRotas = new Grafo<Segment>();
         
 

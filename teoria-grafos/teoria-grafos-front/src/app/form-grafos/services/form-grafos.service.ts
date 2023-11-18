@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { OptionLocation } from '../model/OptionLocation';
+import { OptionLocation } from './../model/OptionLocation';
+import { GrafoMatrixLocations } from '../model/GrafoMatrixLocations';
+import { GrafoMatrixInput } from '../model/GrafoMatrixInput';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +21,13 @@ export class FormGrafosService {
     return this.httpClient.post<OptionLocation[]>(
       this.API + '/autocomplete',
       name
+    );
+  }
+
+  matrix(input: GrafoMatrixInput): Observable<GrafoMatrixLocations[]> {
+    return this.httpClient.post<GrafoMatrixLocations[]>(
+      this.API + '/matrix',
+      input
     );
   }
 }

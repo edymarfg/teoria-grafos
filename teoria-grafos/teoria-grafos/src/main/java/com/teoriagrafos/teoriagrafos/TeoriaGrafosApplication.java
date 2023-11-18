@@ -1,5 +1,7 @@
 package com.teoriagrafos.teoriagrafos;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -30,26 +32,27 @@ public class TeoriaGrafosApplication {
 
 	@Bean
 	CommandLineRunner initMain() {
-		return args -> {Grafo<String> grafo = new Grafo<String>();
-        grafo.adicionarVertice("João");
-        grafo.adicionarVertice("Lorenzo");
-        grafo.adicionarVertice("Creuza");
-        grafo.adicionarVertice("Créber");
-        grafo.adicionarVertice("Cráudio");
+		return args -> {
+        // Grafo<String> grafo = new Grafo<String>();
+        // grafo.adicionarVertice("João");
+        // grafo.adicionarVertice("Lorenzo");
+        // grafo.adicionarVertice("Creuza");
+        // grafo.adicionarVertice("Créber");
+        // grafo.adicionarVertice("Cráudio");
         
-        grafo.adicionarAresta(2.0, "João", "Lorenzo");
-        grafo.adicionarAresta(3.0, "Lorenzo", "Créber");
-        grafo.adicionarAresta(1.0, "Créber", "Creuza");
-        grafo.adicionarAresta(1.0, "João", "Creuza");
-        grafo.adicionarAresta(3.0, "Cráudio", "João");
-        grafo.adicionarAresta(2.0, "Cráudio", "Lorenzo");
+        // grafo.adicionarAresta(2.0, "João", "Lorenzo");
+        // grafo.adicionarAresta(3.0, "Lorenzo", "Créber");
+        // grafo.adicionarAresta(1.0, "Créber", "Creuza");
+        // grafo.adicionarAresta(1.0, "João", "Creuza");
+        // grafo.adicionarAresta(3.0, "Cráudio", "João");
+        // grafo.adicionarAresta(2.0, "Cráudio", "Lorenzo");
         
         
         //grafo.buscaEmLargura();
         //var rotas = searchAPIService.searchAPIService();
         //System.out.println(rotas);
-        //var teste = searchLocalAutoCompleteService.getOptionsLocations("portoa");
-        var teste = searchMatrixLocationsService.buildSearchMatrix();
+        //var testeOpt = searchLocalAutoCompleteService.getOptionsLocations("portoa");
+        //var teste = searchMatrixLocationsService.buildSearchMatrix(testeOpt);
         Grafo<Segment> grafoRotas = new Grafo<Segment>();
         
 

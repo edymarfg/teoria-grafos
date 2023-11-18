@@ -1,21 +1,23 @@
 package com.teoriagrafos.teoriagrafos.model.GrafoModels;
 
+import java.util.ArrayList;
+
 public class Aresta<TIPO> {
-    private Double peso;
+    private ArrayList<Double> peso;
     private Vertice<TIPO> inicio;
     private Vertice<TIPO> fim;
     
-    public Aresta(Double peso, Vertice<TIPO> inicio, Vertice<TIPO> fim){
+    public Aresta(ArrayList<Double> peso, Vertice<TIPO> inicio, Vertice<TIPO> fim){
         this.peso = peso;
         this.inicio = inicio;
         this.fim = fim;
     }
 
-    public Double getPeso() {
+    public ArrayList<Double> getPeso() {
         return peso;
     }
 
-    public void setPeso(Double peso) {
+    public void setPeso(ArrayList<Double> peso) {
         this.peso = peso;
     }
 

@@ -2,9 +2,10 @@
   class="w-2rem"
   position="top-right"
   [showTransformOptions]="'translateY(100%)'"
-  [showTransitionOptions]="'1000ms'"
+  [showTransitionOptions]="'500ms'"
   [hideTransitionOptions]="'1000ms'"
   [showTransformOptions]="'translateX(100%)'"
+  styleClass="toast-style-class"
 ></p-toast>
 
 <div class="mt-3 ml-3 card flex flex-row flex-wrap gap-3">
@@ -43,6 +44,47 @@
       [disabled]="getDisableButton()"
     ></p-button>
   </div>
+</div>
+
+<div class="mt-3 ml-3 card flex flex-row flex-wrap gap-3">
+  <div class="m-3 ml-6">
+    <p-autoComplete
+      [(ngModel)]="optionsAll"
+      [suggestions]="suggestionsAll"
+      (completeMethod)="searchMatrixAutocomplete($event)"
+      [multiple]="true"
+      [size]="35"
+      [delay]="500"
+      field="label"
+      placeholder="Locais"
+    ></p-autoComplete>
+  </div>
+
+  <div class="w-10rem m-3 ml-6">
+    <p-dropdown
+      [options]="suggestionsCategoriaProfile"
+      [(ngModel)]="optionCategoriaProfile"
+      optionLabel="label"
+      [filter]="false"
+    ></p-dropdown>
+  </div>
+</div>
+
+<div class="w-10rem m-3 ml-6">
+  <p-button
+    label="Buscar rotas"
+    (onClick)="searchMatrix()"
+    [pTooltip]="
+      (optionsAll?.length ?? 0) < 2
+        ? 'É preciso selecionar pelo menos dois locais'
+        : ''
+    "
+    [disabled]="(optionsAll?.length ?? 0) < 2"
+  ></p-button>
+</div>
+
+<div class="card flex justify-content-center">
+  <p-organizationChart [value]="grafo"></p-organizationChart>
 </div>
 
 <p>{{ teste | json }}</p>

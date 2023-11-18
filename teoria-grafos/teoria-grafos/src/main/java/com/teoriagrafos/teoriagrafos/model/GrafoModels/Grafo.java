@@ -2,6 +2,9 @@ package com.teoriagrafos.teoriagrafos.model.GrafoModels;
 
 import java.util.ArrayList;
 
+import lombok.Getter;
+
+@Getter
 public class Grafo<TIPO> {
     private ArrayList<Vertice<TIPO>> vertices;
     private ArrayList<Aresta<TIPO>> arestas;
@@ -16,7 +19,7 @@ public class Grafo<TIPO> {
         this.vertices.add(novoVertice);
     }
     
-    public void adicionarAresta(Double peso, TIPO dadoInicio, TIPO dadoFim){
+    public void adicionarAresta(ArrayList<Double> peso, TIPO dadoInicio, TIPO dadoFim){
         Vertice<TIPO> inicio = this.getVertice(dadoInicio);
         Vertice<TIPO> fim = this.getVertice(dadoFim);
         Aresta<TIPO> aresta = new Aresta<TIPO>(peso, inicio, fim);

@@ -11,6 +11,8 @@ import { OrganizationChartModule } from 'primeng/organizationchart';
 import { DropdownModule } from 'primeng/dropdown';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { TooltipModule } from 'primeng/tooltip';
+import { ListboxModule } from 'primeng/listbox';
+import { InputTextModule } from 'primeng/inputtext';
 
 @NgModule({
   declarations: [FormGrafosComponent],
@@ -24,6 +26,8 @@ import { TooltipModule } from 'primeng/tooltip';
     DropdownModule,
     TreeSelectModule,
     TooltipModule,
+    ListboxModule,
+    InputTextModule,
   ],
   providers: [FormGrafosService, MessageService],
 })

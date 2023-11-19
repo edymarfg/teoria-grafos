@@ -23,6 +23,7 @@ export type summary = 'Sucesso' | 'Processando' | 'Atenção' | 'Erro';
 export class FormGrafosComponent {
   @ViewChild('autocompleteatual') autocompleteatual!: AutoComplete;
   @ViewChild('autocompletedestino') autocompletedestino!: AutoComplete;
+  isShowDropdown: boolean = false;
   teste!: string;
   optionAtual?: OptionLocation = undefined;
   suggestionsAtual!: OptionLocation[];
@@ -220,8 +221,8 @@ export class FormGrafosComponent {
   }
 
   private getChild(grafoMatrix: GrafoMatrixLocations): TreeNode[] {
-    // let fim = grafoMatrix.fim.filter((it) => it.fim !== this.matrix[0].inicio);
-    return grafoMatrix.fim.map((it) => {
+    let fim = grafoMatrix.fim.filter((it) => it.fim !== this.matrix[0].inicio);
+    return fim.map((it) => {
       return {
         label: `${it.fim}\nduração: ${this.toHours(
           it.duration

@@ -46,8 +46,8 @@
   </div>
 </div>
 
-<div class="mt-3 ml-3 card flex flex-row flex-wrap gap-3">
-  <div class="m-3 ml-6">
+<div class="mt-3 ml-3 card flex flex-wrap gap-8">
+  <div class="m-3">
     <p-autoComplete
       [(ngModel)]="optionsAll"
       [suggestions]="suggestionsAll"
@@ -60,30 +60,52 @@
     ></p-autoComplete>
   </div>
 
-  <div class="w-10rem m-3 ml-6">
-    <p-dropdown
+  <div class="w-10rem m-3">
+    <div class="flex flex-nowrap">
+      <input
+        type="text"
+        pInputText
+        [style]="{ width: '13rem' }"
+        [(ngModel)]="optionCategoriaProfile.label"
+        [disabled]="true"
+      />
+      <p-button
+        type="button"
+        class="mr-2"
+        [style]="{ width: '2rem' }"
+        (click)="isShowDropdown = !isShowDropdown"
+        icon="pi pi-angle-down"
+      ></p-button>
+    </div>
+    <p-listbox
+      *ngIf="isShowDropdown"
       [options]="suggestionsCategoriaProfile"
       [(ngModel)]="optionCategoriaProfile"
       optionLabel="label"
-      [filter]="false"
-    ></p-dropdown>
+      [style]="{ width: '15rem' }"
+      [listStyle]="{ 'max-height': '220px' }"
+    ></p-listbox>
+  </div>
+
+  <div class="w-10rem m-3">
+    <p-button
+      label="Buscar rotas"
+      (onClick)="searchMatrix()"
+      [pTooltip]="
+        (optionsAll?.length ?? 0) < 2
+          ? 'É preciso selecionar pelo menos dois locais'
+          : ''
+      "
+      [disabled]="(optionsAll?.length ?? 0) < 2"
+    ></p-button>
   </div>
 </div>
 
-<div class="w-10rem m-3 ml-6">
-  <p-button
-    label="Buscar rotas"
-    (onClick)="searchMatrix()"
-    [pTooltip]="
-      (optionsAll?.length ?? 0) < 2
-        ? 'É preciso selecionar pelo menos dois locais'
-        : ''
-    "
-    [disabled]="(optionsAll?.length ?? 0) < 2"
-  ></p-button>
-</div>
-
-<div class="card flex justify-content-center">
+<div
+  *ngIf="!!grafo.length"
+  class="card flex justify-content-center"
+  [ngStyle]="{ 'max-width': '1900px' }"
+>
   <p-organizationChart [value]="grafo"></p-organizationChart>
 </div>
 

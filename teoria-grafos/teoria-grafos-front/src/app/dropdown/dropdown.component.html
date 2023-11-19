@@ -1,0 +1,27 @@
+<div class="w-10rem m-3">
+  <div class="flex flex-nowrap">
+    <input
+      type="text"
+      pInputText
+      [style]="{ width: '13rem' }"
+      [(ngModel)]="option.label"
+      [disabled]="true"
+      [placeholder]="placeholder"
+    />
+    <p-button
+      type="button"
+      [style]="{ width: '2rem' }"
+      (click)="isShowDropdown = !isShowDropdown"
+      icon="pi pi-angle-down"
+    ></p-button>
+  </div>
+  <p-listbox
+    *ngIf="isShowDropdown"
+    [options]="suggestions"
+    [(ngModel)]="option"
+    (ngModelChange)="optionChange.emit(option)"
+    optionLabel="label"
+    [style]="{ width: '15rem' }"
+    [listStyle]="{ 'max-height': '220px' }"
+  ></p-listbox>
+</div>

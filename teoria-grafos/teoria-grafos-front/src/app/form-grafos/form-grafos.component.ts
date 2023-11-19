@@ -23,12 +23,12 @@ export type summary = 'Sucesso' | 'Processando' | 'Atenção' | 'Erro';
 export class FormGrafosComponent {
   @ViewChild('autocompleteatual') autocompleteatual!: AutoComplete;
   @ViewChild('autocompletedestino') autocompletedestino!: AutoComplete;
-  isShowDropdown: boolean = false;
   teste!: string;
-  optionAtual?: OptionLocation = undefined;
-  suggestionsAtual!: OptionLocation[];
 
-  optionDestino?: OptionLocation = undefined;
+  optionAtual: OptionLocation = { label: '', value: [] };
+  optionDestino: OptionLocation = { label: '', value: [] };
+  suggestions!: OptionLocation[];
+
   suggestionsDestino!: OptionLocation[];
 
   optionsAll?: OptionLocation[];
@@ -48,25 +48,17 @@ export class FormGrafosComponent {
 
   onClick() {
     if (!this.optionAtual || !this.optionDestino) return;
-    this.disparaToast('info', 'Processando', 'Solicitação sendo processada');
+    this.toastProcessando;
     this.formGrafosService
       .teste([this.optionAtual, this.optionDestino])
       .subscribe({
         next: (it) => {
           console.log(it);
           this.teste = it;
-          this.disparaToast(
-            'success',
-            'Sucesso',
-            'A solicitação foi realizada com sucesso'
-          );
+          this.toastSucesso;
         },
         error: (err) => {
-          this.disparaToast(
-            'error',
-            'Erro',
-            'Ocorreu um erro na solicitação: ' + err
-          );
+          this.toastErro(err);
         },
       })
       .add(() => this.limpaSelected());
@@ -74,7 +66,7 @@ export class FormGrafosComponent {
 
   searchMatrix() {
     if (!this.optionsAll?.length) return;
-    this.disparaToast('info', 'Processando', 'Solicitação sendo processada');
+    this.toastProcessando();
     this.formGrafosService
       .matrix({
         optns: this.optionsAll,
@@ -87,18 +79,11 @@ export class FormGrafosComponent {
           this.teste = JSON.stringify(it);
           this.matrix = it;
           this.mountTreeNode();
-          this.disparaToast(
-            'success',
-            'Sucesso',
-            'A solicitação foi realizada com sucesso'
-          );
+          this.toastSucesso();
+          this.suggestions = this.optionsAll ?? [];
         },
         error: (err) => {
-          this.disparaToast(
-            'error',
-            'Erro',
-            'Ocorreu um erro na solicitação: ' + err
-          );
+          this.toastErro(err);
         },
       });
   }
@@ -110,18 +95,18 @@ export class FormGrafosComponent {
   }
 
   searchAtual(event: AutoCompleteCompleteEvent) {
-    if (!event.query) {
-      this.suggestionsAtual = [];
-      return;
-    }
-    this.optAtuDisabled = true;
-    this.formGrafosService.autocomplete(event.query).subscribe((it) => {
-      this.suggestionsAtual = it;
-      console.log(this.suggestionsAtual);
-      this.optAtuDisabled = false;
-      this.autocompleteatual.autofocus = true;
-      this.autocompleteatual.overlayVisible = true;
-    });
+    // if (!event.query) {
+    //   this.suggestionsAtual = [];
+    //   return;
+    // }
+    // this.optAtuDisabled = true;
+    // this.formGrafosService.autocomplete(event.query).subscribe((it) => {
+    //   this.suggestionsAtual = it;
+    //   console.log(this.suggestionsAtual);
+    //   this.optAtuDisabled = false;
+    //   this.autocompleteatual.autofocus = true;
+    //   this.autocompleteatual.overlayVisible = true;
+    // });
   }
 
   searchDestino(event: AutoCompleteCompleteEvent) {
@@ -140,25 +125,10 @@ export class FormGrafosComponent {
   }
 
   getDisableButton(): boolean {
-    return !this.optionAtual || !this.optionDestino;
+    return !this.optionAtual.value.length || !this.optionDestino.value.length;
   }
 
   private mountTreeNode() {
-    // const mountChildren = (inicio: GrafoMatrixLocations): TreeNode[] => {
-    //   inicios.push(inicio.inicio);
-    //   let treeNode: TreeNode[] = [];
-    //   inicio.fim.forEach((it) => {
-    //     if (inicios.includes(it.fim)) {
-    //       treeNode.push({
-    //         label: `${
-    //           it.fim
-    //         }\nduração: ${it.duration.toLocaleString()}\ndistância: ${it.distance.toLocaleString()}`,
-    //         children: mountChildren(this.findMatrixByName(it.fim)),
-    //       });
-    //     }
-    //   });
-    //   return treeNode;
-    // };
     this.grafo = [];
     const inicio = this.matrix[0];
     this.grafo.push({
@@ -167,7 +137,6 @@ export class FormGrafosComponent {
       expandedIcon: undefined,
       children: this.mountChildren(inicio),
     });
-    console.log('AQUI O NODE', this.grafo);
   }
 
   private mountChildren(inicio: GrafoMatrixLocations): TreeNode[] {
@@ -183,7 +152,7 @@ export class FormGrafosComponent {
     });
   }
 
-  private toHours(duration: number) {
+  toHours(duration: number) {
     var hours = Math.floor(duration / (60 * 60));
 
     var divisor_for_minutes = duration % (60 * 60);
@@ -194,22 +163,6 @@ export class FormGrafosComponent {
     return `${this.formatNumber(hours)}:${this.formatNumber(
       minutes
     )}:${this.formatNumber(seconds)}`;
-    // var obj = {
-    //   h: hours,
-    //   m: minutes,
-    //   s: seconds,
-    // };
-    // return obj;
-    //return duration / 60 / 60;
-    // const date = new Date();
-    // date.setSeconds(duration);
-    // return date.toTimeString();
-    // return new Intl.DateTimeFormat('pt-BR', {
-    //   hour: '2-digit',
-    //   minute: '2-digit',
-    //   second: '2-digit',
-    // }).format(dura);
-    //return duration;
   }
 
   private formatNumber(num: number): string {
@@ -221,8 +174,8 @@ export class FormGrafosComponent {
   }
 
   private getChild(grafoMatrix: GrafoMatrixLocations): TreeNode[] {
-    let fim = grafoMatrix.fim.filter((it) => it.fim !== this.matrix[0].inicio);
-    return fim.map((it) => {
+    //let fim = grafoMatrix.fim.filter((it) => it.fim !== this.matrix[0].inicio);
+    return grafoMatrix.fim.map((it) => {
       return {
         label: `${it.fim}\nduração: ${this.toHours(
           it.duration
@@ -238,8 +191,28 @@ export class FormGrafosComponent {
   }
 
   private limpaSelected() {
-    this.optionAtual = undefined;
-    this.optionDestino = undefined;
+    this.optionAtual = { label: '', value: [] };
+    this.optionDestino = { label: '', value: [] };
+  }
+
+  private toastProcessando() {
+    this.disparaToast('info', 'Processando', 'Solicitação sendo processada');
+  }
+
+  private toastSucesso() {
+    this.disparaToast(
+      'success',
+      'Sucesso',
+      'A solicitação foi realizada com sucesso'
+    );
+  }
+
+  private toastErro(err: string) {
+    this.disparaToast(
+      'error',
+      'Erro',
+      'Ocorreu um erro na solicitação: ' + err
+    );
   }
 
   private disparaToast(

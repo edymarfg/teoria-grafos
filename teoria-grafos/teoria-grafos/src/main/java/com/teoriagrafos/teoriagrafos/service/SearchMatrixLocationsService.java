@@ -40,8 +40,7 @@ public class SearchMatrixLocationsService {
         .distances(searchMatrix(coordinates, ",\"metrics\":[\"distance\"],\"units\":\"km\"", categoria).getDistances())
         .build();
         grafo = mountGrafo(matrix, vertices);
-        var teste = buildGrafoMatrixLocation();
-        return teste;
+        return buildGrafoMatrixLocation();        
     }
 
     private SearchMatrix searchMatrix(List<ArrayList<Double>> coordinates, String method, String categoria) {        

@@ -25,7 +25,7 @@ public class SearchAPIService {
 
     private GetCoordinatesService getCoordinatesService;
 
-    public Rotas searchAPIService(List<OptionLocation> options) {
+    public Rotas searchAPIService(List<OptionLocation> options, String categoria) {
         Rotas rotas = null;   
 
         // Obtenha as coordenadas da cidade
@@ -36,8 +36,8 @@ public class SearchAPIService {
         if (!options.get(0).getValue().isEmpty()) {
             // Parâmetros da solicitação
             String coordinates = options.get(0).getValue().get(0) + "," + options.get(0).getValue().get(1); // latitude,longitude
-            String coordinatesDest = (options.get(1).getValue().get(0) - 0.2) + "," + (options.get(1).getValue().get(1) - 0.2);
-            String profile = "driving-car";  // Perfil de roteamento (pode ser driving-car, etc.)
+            String coordinatesDest = options.get(1).getValue().get(0) + "," + options.get(1).getValue().get(1);
+            String profile = categoria;  // Perfil de roteamento (pode ser driving-car, etc.)
 
             // Construa a URL da solicitação
             String urlString = String.format("%s%s?api_key=%s&start=%s&end=%s",

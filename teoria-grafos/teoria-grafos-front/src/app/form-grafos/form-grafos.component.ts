@@ -11,6 +11,7 @@ import {
   CategoriaProfile,
   categoriaProfileOptions,
 } from './model/CategoriaProfile';
+import { Step } from './model/Step';
 
 export type severity = 'success' | 'info' | 'warn' | 'error';
 export type summary = 'Sucesso' | 'Processando' | 'Atenção' | 'Erro';
@@ -29,7 +30,7 @@ export class FormGrafosComponent {
   optionDestino: OptionLocation = { label: '', value: [] };
   suggestions!: OptionLocation[];
 
-  suggestionsDestino!: OptionLocation[];
+  // suggestionsDestino!: OptionLocation[];
 
   optionsAll?: OptionLocation[];
   suggestionsAll!: OptionLocation[];
@@ -39,33 +40,39 @@ export class FormGrafosComponent {
 
   optAtuDisabled = false;
   optDestDisabled = false;
+  showCategoriaDropdown = false;
   grafo: TreeNode[] = [];
   matrix: GrafoMatrixLocations[] = [];
+  rotaPerson: Step[] = [];
   constructor(
     private readonly formGrafosService: FormGrafosService,
     private messageService: MessageService
   ) {}
 
-  onClick() {
+  onSearchSteps() {
     if (!this.optionAtual || !this.optionDestino) return;
-    this.toastProcessando;
+    this.toastProcessando();
     this.formGrafosService
-      .teste([this.optionAtual, this.optionDestino])
+      .rotas({
+        optns: [this.optionAtual, this.optionDestino],
+        categoria: this.optionCategoriaProfile.value,
+      })
       .subscribe({
         next: (it) => {
           console.log(it);
-          this.teste = it;
-          this.toastSucesso;
+          this.rotaPerson = it;
+          this.toastSucesso();
         },
         error: (err) => {
           this.toastErro(err);
         },
-      })
-      .add(() => this.limpaSelected());
+      });
   }
 
   searchMatrix() {
     if (!this.optionsAll?.length) return;
+    this.rotaPerson = [];
+    this.showCategoriaDropdown = false;
     this.toastProcessando();
     this.formGrafosService
       .matrix({
@@ -94,35 +101,35 @@ export class FormGrafosComponent {
     });
   }
 
-  searchAtual(event: AutoCompleteCompleteEvent) {
-    // if (!event.query) {
-    //   this.suggestionsAtual = [];
-    //   return;
-    // }
-    // this.optAtuDisabled = true;
-    // this.formGrafosService.autocomplete(event.query).subscribe((it) => {
-    //   this.suggestionsAtual = it;
-    //   console.log(this.suggestionsAtual);
-    //   this.optAtuDisabled = false;
-    //   this.autocompleteatual.autofocus = true;
-    //   this.autocompleteatual.overlayVisible = true;
-    // });
-  }
+  // searchAtual(event: AutoCompleteCompleteEvent) {
+  // if (!event.query) {
+  //   this.suggestionsAtual = [];
+  //   return;
+  // }
+  // this.optAtuDisabled = true;
+  // this.formGrafosService.autocomplete(event.query).subscribe((it) => {
+  //   this.suggestionsAtual = it;
+  //   console.log(this.suggestionsAtual);
+  //   this.optAtuDisabled = false;
+  //   this.autocompleteatual.autofocus = true;
+  //   this.autocompleteatual.overlayVisible = true;
+  // });
+  // }
 
-  searchDestino(event: AutoCompleteCompleteEvent) {
-    if (!event.query) {
-      this.suggestionsDestino = [];
-      return;
-    }
-    this.optDestDisabled = true;
-    this.formGrafosService.autocomplete(event.query).subscribe((it) => {
-      this.suggestionsDestino = it;
-      console.log(this.suggestionsDestino);
-      this.optDestDisabled = false;
-      this.autocompletedestino.autofocus = true;
-      this.autocompletedestino.overlayVisible = true;
-    });
-  }
+  // searchDestino(event: AutoCompleteCompleteEvent) {
+  //   if (!event.query) {
+  //     this.suggestionsDestino = [];
+  //     return;
+  //   }
+  //   this.optDestDisabled = true;
+  //   this.formGrafosService.autocomplete(event.query).subscribe((it) => {
+  //     this.suggestionsDestino = it;
+  //     console.log(this.suggestionsDestino);
+  //     this.optDestDisabled = false;
+  //     this.autocompletedestino.autofocus = true;
+  //     this.autocompletedestino.overlayVisible = true;
+  //   });
+  // }
 
   getDisableButton(): boolean {
     return !this.optionAtual.value.length || !this.optionDestino.value.length;
@@ -152,7 +159,11 @@ export class FormGrafosComponent {
     });
   }
 
-  toHours(duration: number) {
+  toKm(distance: number): string {
+    return (distance / 1000).toFixed(2);
+  }
+
+  toHours(duration: number): string {
     var hours = Math.floor(duration / (60 * 60));
 
     var divisor_for_minutes = duration % (60 * 60);

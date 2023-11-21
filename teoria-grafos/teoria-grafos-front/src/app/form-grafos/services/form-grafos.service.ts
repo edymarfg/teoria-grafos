@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { OptionLocation } from './../model/OptionLocation';
 import { GrafoMatrixLocations } from '../model/GrafoMatrixLocations';
 import { GrafoMatrixInput } from '../model/GrafoMatrixInput';
+import { Step } from '../model/Step';
 
 @Injectable({
   providedIn: 'root',
@@ -13,8 +14,8 @@ export class FormGrafosService {
 
   constructor(private httpClient: HttpClient) {}
 
-  teste(options: OptionLocation[]): Observable<string> {
-    return this.httpClient.post<string>(this.API, options);
+  rotas(input: GrafoMatrixInput): Observable<Step[]> {
+    return this.httpClient.post<Step[]>(this.API + '/rotas', input);
   }
 
   autocomplete(name: string): Observable<OptionLocation[]> {

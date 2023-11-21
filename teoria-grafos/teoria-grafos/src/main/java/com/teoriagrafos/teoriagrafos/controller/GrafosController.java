@@ -1,5 +1,6 @@
 package com.teoriagrafos.teoriagrafos.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +16,8 @@ import com.teoriagrafos.teoriagrafos.model.SearchMatrixLocationsModels.GrafoMatr
 import com.teoriagrafos.teoriagrafos.model.SearchMatrixLocationsModels.GrafoMatrixLocations;
 import com.teoriagrafos.teoriagrafos.model.SearchMatrixLocationsModels.SearchMatrix;
 import com.teoriagrafos.teoriagrafos.model.SearchRotasModels.Rotas;
+import com.teoriagrafos.teoriagrafos.model.SearchRotasModels.Segment;
+import com.teoriagrafos.teoriagrafos.model.SearchRotasModels.Step;
 import com.teoriagrafos.teoriagrafos.service.SearchAPIService;
 import com.teoriagrafos.teoriagrafos.service.SearchLocalAutoCompleteService;
 import com.teoriagrafos.teoriagrafos.service.SearchMatrixLocationsService;
@@ -30,9 +33,13 @@ public class GrafosController {
     private SearchLocalAutoCompleteService searchLocalAutoCompleteService;
     private SearchMatrixLocationsService searchMatrixLocationsService;
 
-    @PostMapping
-    public Rotas list(@RequestBody @Validated List<OptionLocation> options) {
-        return searchAPIService.searchAPIService(options);
+    @PostMapping("/rotas")
+    public ArrayList<Step> list(@RequestBody @Validated GrafoMatrixInput input) {
+        var result = searchAPIService.searchAPIService(input.getOptns(), input.getCategoria());
+        if (result != null) {
+            return result.getFeatures().get(0).getProperties().getSegments().get(0).getSteps();
+        }
+        return null;
     }
 
     @PostMapping("/autocomplete")

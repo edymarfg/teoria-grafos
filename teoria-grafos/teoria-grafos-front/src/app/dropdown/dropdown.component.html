@@ -19,7 +19,9 @@
     *ngIf="isShowDropdown"
     [options]="suggestions"
     [(ngModel)]="option"
-    (ngModelChange)="optionChange.emit(option)"
+    (ngModelChange)="
+      optionChange.emit(option); isShowDropdown = !isShowDropdown
+    "
     optionLabel="label"
     [style]="{ width: '15rem' }"
     [listStyle]="{ 'max-height': '220px' }"

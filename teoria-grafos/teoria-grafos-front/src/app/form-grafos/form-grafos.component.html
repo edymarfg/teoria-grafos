@@ -45,7 +45,6 @@
     ></p-button>
   </div>
 </div> -->
-
 <div class="mt-3 ml-3 card flex flex-wrap gap-8">
   <div class="m-3" style="max-width: 50vw">
     <p-autoComplete
@@ -81,99 +80,107 @@
   </div>
 </div>
 
-<p-divider *ngIf="!!grafo.length"></p-divider>
-
-<div
-  *ngIf="!!grafo.length"
-  class="card flex flex-column justify-content-center"
-  [ngStyle]="{ 'max-width': '1900px' }"
->
-  <div class="mt-3 ml-3 card flex flex-wrap gap-8">
-    <app-dropdown
-      [suggestions]="suggestions"
-      [(option)]="optionAtual"
-      placeholder="Local de saída"
-    ></app-dropdown>
-    <app-dropdown
-      [suggestions]="suggestions"
-      [(option)]="optionDestino"
-      placeholder="Local de chegada"
-    ></app-dropdown>
-    <div class="w-10rem m-3">
-      <p-button
-        label="Buscar steps personalizados"
-        (onClick)="onSearchSteps()"
-        [disabled]="getDisableButton()"
-        [pTooltip]="
-          getDisableButton()
-            ? 'É preciso selecionar o local de saída e chegada'
-            : ''
-        "
-      ></p-button>
+<div>
+  <div class="map-container">
+    <div class="map-frame">
+      <div id="map"></div>
     </div>
   </div>
 
-  <p-table
-    *ngIf="rotaPerson.length"
-    class="p-datatable-striped"
-    [value]="rotaPerson"
-    [paginator]="true"
-    [rows]="10"
-    [showCurrentPageReport]="true"
-    [tableStyle]="{ 'min-width': '1500px' }"
-    currentPageReportTemplate="Mostrando {first} ao {last} de {totalRecords} steps"
-    [rowsPerPageOptions]="[10, 25, 50]"
+  <p-divider *ngIf="!!grafo.length"></p-divider>
+
+  <div
+    *ngIf="!!grafo.length"
+    class="card flex flex-column justify-content-center"
+    [ngStyle]="{ 'max-width': '1900px' }"
   >
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Step</th>
-        <th>Localidade</th>
-        <th>Duração</th>
-        <th>Distância</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-item>
-      <tr>
-        <td>{{ item.instruction }}</td>
-        <td>{{ item.name }}</td>
-        <td>{{ toHours(item.duration) }}</td>
-        <td>{{ toKm(item.distance) }}Km</td>
-      </tr>
-    </ng-template>
-  </p-table>
+    <div class="mt-3 ml-3 card flex flex-wrap gap-8">
+      <app-dropdown
+        [suggestions]="suggestions"
+        [(option)]="optionAtual"
+        placeholder="Local de saída"
+      ></app-dropdown>
+      <app-dropdown
+        [suggestions]="suggestions"
+        [(option)]="optionDestino"
+        placeholder="Local de chegada"
+      ></app-dropdown>
+      <div class="w-10rem m-3">
+        <p-button
+          label="Buscar steps personalizados"
+          (onClick)="onSearchSteps()"
+          [disabled]="getDisableButton()"
+          [pTooltip]="
+            getDisableButton()
+              ? 'É preciso selecionar o local de saída e chegada'
+              : ''
+          "
+        ></p-button>
+      </div>
+    </div>
 
-  <p-divider></p-divider>
+    <p-table
+      *ngIf="rotaPerson.length"
+      class="p-datatable-striped"
+      [value]="rotaPerson"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      [tableStyle]="{ 'min-width': '1500px' }"
+      currentPageReportTemplate="Mostrando {first} ao {last} de {totalRecords} steps"
+      [rowsPerPageOptions]="[10, 25, 50]"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Step</th>
+          <th>Localidade</th>
+          <th>Duração</th>
+          <th>Distância</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.instruction }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ toHours(item.duration) }}</td>
+          <td>{{ toKm(item.distance) }}Km</td>
+        </tr>
+      </ng-template>
+    </p-table>
 
-  <div style="max-width: 1900px; overflow-x: auto">
-    <p-organizationChart [value]="grafo"></p-organizationChart>
+    <p-divider></p-divider>
+
+    <div style="max-width: 1900px; overflow-x: auto">
+      <p-organizationChart [value]="grafo"></p-organizationChart>
+    </div>
+
+    <p-divider></p-divider>
+
+    <p-table
+      class="p-datatable-striped"
+      [value]="matrix"
+      [tableStyle]="{ 'min-width': '1500px' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Inicio</th>
+          <th>Fim</th>
+          <th>Duração</th>
+          <th>Distância</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr *ngFor="let fim of item.fim">
+          <td>{{ item.inicio }}</td>
+          <td>{{ fim.fim }}</td>
+          <td>{{ toHours(fim.duration) }}</td>
+          <td>{{ fim.distance }}Km</td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 
   <p-divider></p-divider>
-
-  <p-table
-    class="p-datatable-striped"
-    [value]="matrix"
-    [tableStyle]="{ 'min-width': '1500px' }"
-  >
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Inicio</th>
-        <th>Fim</th>
-        <th>Duração</th>
-        <th>Distância</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-item>
-      <tr *ngFor="let fim of item.fim">
-        <td>{{ item.inicio }}</td>
-        <td>{{ fim.fim }}</td>
-        <td>{{ toHours(fim.duration) }}</td>
-        <td>{{ fim.distance }}Km</td>
-      </tr>
-    </ng-template>
-  </p-table>
 </div>
-
-<p-divider></p-divider>
 
 <p>{{ teste | json }}</p>

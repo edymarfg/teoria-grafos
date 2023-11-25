@@ -19,6 +19,22 @@
   height: 100%;
 }
 
+.leaflet-routing-container {
+  display: none;
+}
+
+::ng-deep {
+  /* Altera a cor do texto das instruções para verde */
+  .leaflet-routing-alt {
+    color: #466276 !important;
+  }
+
+  /* Altera a cor de fundo das instruções para amarelo */
+  .leaflet-routing-alt tr:hover {
+    color: #56bdff !important;
+  }
+}
+
 // .card {
 //   background: var(--surface-card);
 //   padding: 2rem;

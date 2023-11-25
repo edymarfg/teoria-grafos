@@ -49,6 +49,7 @@
   <div class="m-3" style="max-width: 50vw">
     <p-autoComplete
       [(ngModel)]="optionsAll"
+      (ngModelChange)="limpaSelected()"
       [suggestions]="suggestionsAll"
       (completeMethod)="searchMatrixAutocomplete($event)"
       [multiple]="true"
@@ -62,7 +63,7 @@
   <app-dropdown
     [suggestions]="suggestionsCategoriaProfile"
     [option]="optionCategoriaProfile"
-    (optionChange)="optionCategoriaProfile = $event"
+    (optionChange)="optionCategoriaProfile = $event; limpaSelected()"
     [isShowDropdown]="showCategoriaDropdown"
   ></app-dropdown>
 
@@ -183,4 +184,5 @@
   <p-divider></p-divider>
 </div>
 
-<p>{{ teste | json }}</p>
+<ng-template #summaryTemplate>p</ng-template>
+<!-- <p>{{ teste | json }}</p> -->

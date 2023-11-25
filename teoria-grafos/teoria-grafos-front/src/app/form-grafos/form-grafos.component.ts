@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { MessageService, TreeNode } from 'primeng/api';
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { OptionLocation } from './model/OptionLocation';
@@ -10,6 +10,8 @@ import {
 } from './model/CategoriaProfile';
 import { Step } from './model/Step';
 import * as L from 'leaflet';
+import 'leaflet-routing-machine';
+import { DomElementSchemaRegistry } from '@angular/compiler';
 
 type severity = 'success' | 'info' | 'warn' | 'error';
 type summary = 'Sucesso' | 'Processando' | 'Atenção' | 'Erro';
@@ -51,7 +53,6 @@ export class FormGrafosComponent implements AfterViewInit {
   suggestionsCategoriaProfile = categoriaProfileOptions;
 
   private map!: L.Map;
-  private coord = [51.505, -0.09];
 
   optAtuDisabled = false;
   optDestDisabled = false;
@@ -66,7 +67,7 @@ export class FormGrafosComponent implements AfterViewInit {
   ) {}
 
   ngAfterViewInit(): void {
-    this.creatMap({ label: 'te', value: [-47.9292, -15.7801] }, 5);
+    this.creatMap({ label: '', value: [-47.9292, -15.7801] }, 5);
   }
 
   onSearchSteps() {
@@ -80,7 +81,7 @@ export class FormGrafosComponent implements AfterViewInit {
       .subscribe({
         next: (it) => {
           this.rotaPerson = it;
-          this.initMap([this.optionAtual, this.optionDestino]);
+          this.initMap([this.optionAtual, this.optionDestino], true);
           this.toastSucesso();
         },
         error: (err) => {
@@ -101,10 +102,12 @@ export class FormGrafosComponent implements AfterViewInit {
       })
       .subscribe({
         next: (it) => {
+          console.log(it);
+
           this.teste = JSON.stringify(it);
           this.matrix = it;
           this.mountTreeNode();
-          this.initMap(this.optionsAll ?? []);
+          this.initMap(this.optionsAll ?? [], false);
           this.toastSucesso();
           this.suggestions = this.optionsAll ?? [];
         },
@@ -139,37 +142,81 @@ export class FormGrafosComponent implements AfterViewInit {
     tiles.addTo(this.map);
   }
 
-  initMap(options: OptionLocation[]): void {
+  initMap(options: OptionLocation[], isBetweenTwo: boolean): void {
     if (this.map) {
       this.map.remove();
     }
     this.creatMap(options[0], 7);
-    this.makeMarkers(options);
+    isBetweenTwo ? this.makeRouting(options) : this.makeMarkers(options);
   }
 
   makeMarkers(options: OptionLocation[]): void {
     options.forEach((opt) => {
       const values = this.turnValues(opt.value);
-      const mark = L.marker(values).addTo(this.map);
-
-      if (options.length === 2) {
-        mark
-          .bindPopup(this.makePopup(options[0].label, options[1].label))
-          .openPopup();
-      }
-
-      mark.addTo(this.map);
+      L.marker(values).addTo(this.map);
     });
 
     const coord = this.connectTheDots(options);
+    L.polyline(coord).addTo(this.map);
+  }
 
-    setTimeout(() => L.polyline(coord).addTo(this.map));
+  makeRouting(options: OptionLocation[]): void {
+    const plan = L.Routing.plan(
+      [
+        L.latLng(options[0].value[1], options[0].value[0]),
+        L.latLng(options[1].value[1], options[1].value[0]),
+      ],
+      {
+        createMarker: (waypointIndex, waypoint, numberOfWaypoints) => {
+          const marker = L.marker(waypoint.latLng, {
+            draggable: true,
+          });
+
+          if (waypointIndex === 0) {
+            marker.bindPopup(`<div>${options[0].label}</div>`).openPopup();
+          }
+
+          if (waypointIndex === 1) {
+            marker
+              .bindPopup(this.makePopup(options[0].label, options[1].label))
+              .openPopup();
+          }
+
+          marker.addEventListener('update', (e) => {
+            marker.openPopup();
+            console.log(e);
+          });
+          return marker.addTo(this.map);
+        },
+        language: 'pt',
+      }
+    ).addTo(this.map);
+
+    L.Routing.osrmv1({
+      language: 'pt',
+      profile: 'bike',
+    });
+
+    const control = L.Routing.control({
+      showAlternatives: true,
+      routeWhileDragging: true,
+      lineOptions: {
+        styles: [{ color: '#242c81', weight: 5 }, {}],
+        extendToWaypoints: true,
+        missingRouteTolerance: 0,
+      },
+      altLineOptions: {
+        extendToWaypoints: true,
+        missingRouteTolerance: 0,
+      },
+      collapsible: true,
+      summaryTemplate: '<h2>{name}</h2><h3>{distance}, {time}</h3>',
+      plan: plan.openPopup(),
+    }).addTo(this.map);
   }
 
   makePopup(inicio: string, fim: string): string {
     const d = this.findDistanceAndDurationByName(inicio, fim);
-    console.log(d);
-
     if (!d) return '';
     return (
       `` +
@@ -277,9 +324,12 @@ export class FormGrafosComponent implements AfterViewInit {
     return [values[1], values[0]] as L.LatLngExpression;
   }
 
-  private limpaSelected() {
+  limpaSelected() {
     this.optionAtual = { label: '', value: [] };
     this.optionDestino = { label: '', value: [] };
+    this.grafo = [];
+    this.matrix = [];
+    this.rotaPerson = [];
   }
 
   private toastProcessando() {
